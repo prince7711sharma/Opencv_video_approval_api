@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agri Video Moderation Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+
+    button {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #1b5e20;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Agri Video Moderation</h2>
+
+  <input type="file" id="videoFile" accept="video/*" />
+  <br><br>
+
+  <button onclick="uploadVideo()">Check Video</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+async function uploadVideo() {
+  const fileInput = document.getElementById("videoFile");
+  const resultDiv = document.getElementById("result");
+
+  if (!fileInput.files.length) {
+    alert("Please select a video");
+    return;
+  }
+
+  resultDiv.innerHTML = "Checking...";
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  try {
+    const response = await fetch(
+      "https://agri-video-moderation.onrender.com/api/moderate-video",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.status === "APPROVED") {
+      resultDiv.style.color = "green";
+    } else {
+      resultDiv.style.color = "red";
+    }
+
+    resultDiv.innerHTML = data.status;
+  } catch (error) {
+    resultDiv.style.color = "red";
+    resultDiv.innerHTML = "Error connecting to API";
+    console.error(error);
+  }
+}
+</script>
+
+</body>
+</html>
